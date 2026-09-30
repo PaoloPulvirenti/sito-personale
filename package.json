@@ -1,0 +1,35 @@
+{
+  "name": "sito-personale",
+  "private": true,
+  "type": "module",
+  "description": "Sito personale di Paolo Pulvirenti: Astro (web) + Fastify (api) su Cloud Run + Firestore",
+  "license": "MIT",
+  "workspaces": [
+    "api",
+    "web"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev:api": "npm run dev -w api",
+    "dev:web": "npm run dev -w web",
+    "build": "npm run build -w api && npm run build -w web",
+    "test": "npm run test -w api",
+    "typecheck": "npm run typecheck -w api && npm run check -w web",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.0",
+    "eslint": "^10.11.0",
+    "eslint-plugin-astro": "^3.2.1",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.9",
+    "prettier-plugin-astro": "^1.1.0",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "typescript": "~6.0.0",
+    "typescript-eslint": "^8.71.0"
+  }
+}

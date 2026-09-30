@@ -1,0 +1,20 @@
+node_modules/
+dist/
+.astro/
+coverage/
+
+# segreti e configurazioni locali: mai nel repo
+.env
+.env.*
+!.env.example
+*-key.json
+service-account*.json
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+.DS_Store
+Thumbs.db
