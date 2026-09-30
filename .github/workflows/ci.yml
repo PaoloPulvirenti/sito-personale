@@ -1,0 +1,113 @@
+name: CI/CD
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint, test e build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run typecheck
+
+      - name: Avvia l'emulatore Firestore
+        run: |
+          docker run -d --name firestore -p 8081:8081 \
+            gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators \
+            gcloud emulators firestore start --host-port=0.0.0.0:8081 --project=demo-sito-personale
+          for i in $(seq 1 60); do curl -sf http://localhost:8081 && exit 0; sleep 2; done
+          docker logs firestore; exit 1
+
+      - name: Test (unit, integration ed emulatore)
+        run: npm test
+        env:
+          FIRESTORE_EMULATOR_HOST: localhost:8081
+
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v7
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          name: web-dist
+          path: web/dist
+          retention-days: 7
+
+  deploy:
+    name: Deploy su Cloud Run e Firebase Hosting
+    needs: quality
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.GCP_PROJECT_ID != ''
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      id-token: write # Workload Identity Federation: niente chiavi JSON nei secret
+    env:
+      PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      REGION: europe-west1
+      SERVICE: sito-api
+      IMAGE: europe-west1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/sito/api:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v3
+
+      - name: Build e push dell'immagine
+        run: |
+          gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+          docker build -t "$IMAGE" .
+          docker push "$IMAGE"
+
+      - uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          service: ${{ env.SERVICE }}
+          region: ${{ env.REGION }}
+          image: ${{ env.IMAGE }}
+          flags: >-
+            --service-account=${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+            --allow-unauthenticated
+            --min-instances=0
+            --max-instances=2
+            --memory=256Mi
+            --cpu=1
+            --concurrency=40
+          env_vars: |
+            GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }}
+            TRUST_PROXY_HOPS=2
+            LOG_LEVEL=info
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-dist
+          path: web/dist
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Deploy di Firebase Hosting e regole Firestore
+        run: npx --yes firebase-tools@15 deploy --only hosting,firestore:rules --project "$PROJECT_ID" --non-interactive

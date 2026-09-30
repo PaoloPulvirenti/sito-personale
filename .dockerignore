@@ -1,0 +1,10 @@
+**/node_modules
+**/dist
+**/.astro
+**/coverage
+web/public
+.git
+.github
+.env
+.env.*
+*.md
