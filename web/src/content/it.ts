@@ -100,9 +100,21 @@ export const it: SiteContent = {
           'Cloudflare Workers',
         ],
         links: [],
-        screenshots: [],
-        screenshotsTodo:
-          'Aggiungere 2-3 screenshot con dati fittizi in web/src/assets/progetti/ e elencarli qui.',
+        screenshots: [
+          {
+            file: 'presidium-home.png',
+            alt: 'Home del gestionale: dipendenti in forza, buste paga del mese da inviare e grafico del netto erogato negli ultimi 12 mesi.',
+          },
+          {
+            file: 'presidium-buste-paga.png',
+            alt: 'Sezione buste paga: riepilogo dei mesi, caricamento dei PDF del consulente ed elenco dei cedolini riconosciuti.',
+          },
+          {
+            file: 'presidium-presenze.png',
+            alt: 'Riepilogo mensile delle presenze giorno per giorno, con legenda di ore corrette, extra e mancanti.',
+          },
+        ],
+        screenshotsNote: 'Versione di prova con dati fittizi; nomi e dati anagrafici oscurati.',
       },
       {
         title: 'Gift Rush',

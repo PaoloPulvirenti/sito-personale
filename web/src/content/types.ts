@@ -29,6 +29,8 @@ export interface Project {
   screenshots: { file: string; alt: string }[];
   /** Se valorizzato e non ci sono screenshot, compare un TODO visibile con questo testo. */
   screenshotsTodo?: string;
+  /** Didascalia sotto gli screenshot. */
+  screenshotsNote?: string;
   /** Se true, sotto la card compare il diagramma dell'architettura del sito. */
   showArchitecture?: boolean;
 }

@@ -39,17 +39,33 @@ const { projects } = getContent();
           </dl>
 
           {screenshots.length > 0 && (
-            <div class="mt-6 grid gap-3 sm:grid-cols-2">
-              {screenshots.map(({ image, alt }) => (
-                <Image
-                  src={image}
-                  alt={alt}
-                  widths={[400, 800]}
-                  sizes="(min-width: 640px) 400px, 100vw"
-                  class="rounded-md border border-border"
-                />
-              ))}
-            </div>
+            <figure class="mt-6">
+              <div class="grid gap-3 sm:grid-cols-2">
+                {screenshots.map(({ image, alt }, index) => (
+                  <a
+                    href={image.src}
+                    class:list={['block', index === 0 && 'sm:col-span-2']}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <Image
+                      src={image}
+                      alt={alt}
+                      widths={index === 0 ? [640, 1280] : [400, 800]}
+                      sizes={
+                        index === 0
+                          ? '(min-width: 896px) 820px, 100vw'
+                          : '(min-width: 896px) 405px, (min-width: 640px) 50vw, 100vw'
+                      }
+                      class="w-full rounded-md border border-border"
+                    />
+                  </a>
+                ))}
+              </div>
+              {project.screenshotsNote && (
+                <figcaption class="mt-2 text-xs text-muted">{project.screenshotsNote}</figcaption>
+              )}
+            </figure>
           )}
           {screenshots.length === 0 && project.screenshotsTodo && (
             <Todo class="mt-6">{project.screenshotsTodo}</Todo>
