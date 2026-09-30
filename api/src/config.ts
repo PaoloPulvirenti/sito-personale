@@ -18,6 +18,8 @@ export interface Config {
   rateLimitWindowMs: number;
   /** Versione dell'informativa privacy accettata dall'utente, salvata con il messaggio. */
   privacyVersion: string;
+  /** Giorni dopo cui Firestore cancella il messaggio (policy TTL sul campo expireAt). */
+  retentionDays: number;
 }
 
 function readInt(env: NodeJS.ProcessEnv, name: string, fallback: number): number {
@@ -50,5 +52,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     rateLimitMax: readInt(env, 'RATE_LIMIT_MAX', 5),
     rateLimitWindowMs: readInt(env, 'RATE_LIMIT_WINDOW_MS', 10 * 60 * 1000),
     privacyVersion: env.PRIVACY_VERSION ?? '2026-09-30',
+    retentionDays: readInt(env, 'RETENTION_DAYS', 365),
   };
 }

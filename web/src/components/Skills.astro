@@ -1,0 +1,30 @@
+---
+import { getContent } from '../content';
+import Section from './Section.astro';
+
+const { skills } = getContent();
+---
+
+<Section id="competenze" title={skills.title}>
+  <dl class="grid gap-x-8 gap-y-6 sm:grid-cols-[11rem_1fr]">
+    {skills.groups.map((group) => (
+      <>
+        <dt class="font-semibold">{group.area}</dt>
+        <dd class="-mt-4 sm:mt-0">
+          <ul class="flex flex-wrap gap-x-2 gap-y-1 text-muted">
+            {group.items.map((item, index) => (
+              <li>
+                {item}
+                {index < group.items.length - 1 && (
+                  <span class="ml-2 text-border" aria-hidden="true">
+                    /
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </dd>
+      </>
+    ))}
+  </dl>
+</Section>

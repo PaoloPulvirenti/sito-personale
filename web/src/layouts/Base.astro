@@ -1,0 +1,43 @@
+---
+import '../styles/global.css';
+import { getContent } from '../content';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const content = getContent();
+const { title = content.meta.title, description = content.meta.description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang={content.locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#0f3d5e" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d1318" media="(prefers-color-scheme: dark)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={content.meta.siteName} />
+    <meta property="og:locale" content="it_IT" />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body class="min-h-dvh font-sans leading-relaxed">
+    <a
+      href="#contenuto"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:text-on-accent"
+    >
+      {content.skipLink}
+    </a>
+    <slot />
+  </body>
+</html>

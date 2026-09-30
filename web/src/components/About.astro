@@ -1,0 +1,14 @@
+---
+import { getContent } from '../content';
+import Section from './Section.astro';
+
+const { about } = getContent();
+---
+
+<Section id="chi-sono" title={about.title}>
+  <div class="max-w-2xl space-y-4 text-lg text-pretty">
+    {about.paragraphs.map((paragraph) => (
+      <p>{paragraph}</p>
+    ))}
+  </div>
+</Section>

@@ -1,0 +1,27 @@
+---
+import { getContent } from '../content';
+
+const { hero, nav } = getContent();
+---
+
+<header class="sticky top-0 z-40 border-b border-border bg-bg/90 backdrop-blur supports-[backdrop-filter]:bg-bg/75">
+  <div class="container-page flex h-14 items-center justify-between gap-4">
+    <a href="/" class="font-semibold tracking-tight text-fg hover:text-accent">
+      {hero.name}
+    </a>
+    <nav aria-label="Sezioni" class="-mr-2 overflow-x-auto">
+      <ul class="flex gap-1 text-sm whitespace-nowrap">
+        {nav.map((item, index) => (
+          <li class:list={[index < nav.length - 1 && 'hidden md:block']}>
+            <a
+              href={`/${item.href}`}
+              class="block rounded-md px-2 py-1.5 text-muted hover:bg-accent-soft hover:text-accent"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>

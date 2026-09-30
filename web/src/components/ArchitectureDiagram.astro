@@ -1,0 +1,61 @@
+---
+import { getContent } from '../content';
+
+const { architecture } = getContent();
+const { nodes } = architecture;
+
+// Flusso di una richiesta, da sinistra a destra (dall'alto in basso su mobile).
+const flow = [
+  { label: nodes.browser, detail: 'HTML · CSS · JS minimo' },
+  { label: nodes.hosting, detail: 'pagine statiche Astro', edge: 'GET /' },
+  { label: nodes.api, detail: 'validazione · rate limit', edge: 'POST /api/contact' },
+  { label: nodes.db, detail: 'messaggi con TTL', edge: 'add()' },
+];
+---
+
+<figure class="mt-6 rounded-lg border border-border bg-surface p-4 sm:p-6">
+  <figcaption class="mb-5">
+    <span class="block font-semibold">{architecture.title}</span>
+    <span class="mt-1 block text-sm text-muted">{architecture.caption}</span>
+  </figcaption>
+
+  <ol class="flex flex-col items-stretch gap-0 lg:flex-row lg:items-center">
+    {flow.map((node, index) => (
+      <>
+        {index > 0 && (
+          <li aria-hidden="true" class="flex items-center justify-center py-1 lg:px-1 lg:py-0">
+            <span class="flex flex-col items-center font-mono text-[11px] text-muted lg:min-w-20">
+              <span>{node.edge}</span>
+              <span class="text-accent lg:hidden">↓</span>
+              <span class="hidden text-accent lg:inline">→</span>
+            </span>
+          </li>
+        )}
+        <li class="flex-1 rounded-md border border-border bg-bg px-3 py-2.5 text-center">
+          <span class="block text-sm font-semibold text-fg">{node.label}</span>
+          <span class="block font-mono text-xs text-muted">{node.detail}</span>
+        </li>
+      </>
+    ))}
+  </ol>
+
+  <div class="mt-4 flex flex-col items-center gap-1 border-t border-dashed border-border pt-4 text-center lg:flex-row lg:justify-center lg:gap-3">
+    <span class="rounded-md border border-border bg-bg px-3 py-1.5 text-sm font-semibold">
+      {nodes.ci}
+    </span>
+    <span class="font-mono text-xs text-muted">
+      lint · test · build → deploy su {nodes.hosting} e Cloud Run
+    </span>
+  </div>
+
+  <ul class="mt-5 grid gap-2 text-sm text-muted sm:grid-cols-2">
+    {architecture.notes.map((note) => (
+      <li class="flex gap-2">
+        <span class="text-accent" aria-hidden="true">
+          ▸
+        </span>
+        {note}
+      </li>
+    ))}
+  </ul>
+</figure>

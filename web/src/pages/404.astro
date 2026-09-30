@@ -1,0 +1,23 @@
+---
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { getContent } from '../content';
+import Base from '../layouts/Base.astro';
+
+const { notFound, meta } = getContent();
+---
+
+<Base title={`${notFound.title} · ${meta.siteName}`}>
+  <Header />
+  <main id="contenuto" class="container-page py-24">
+    <p class="font-mono text-sm text-accent">404</p>
+    <h1 class="mt-2 text-3xl font-bold tracking-tight">{notFound.title}</h1>
+    <p class="mt-4 text-muted">{notFound.body}</p>
+    <p class="mt-8">
+      <a class="btn btn-primary" href="/">
+        {notFound.back}
+      </a>
+    </p>
+  </main>
+  <Footer />
+</Base>

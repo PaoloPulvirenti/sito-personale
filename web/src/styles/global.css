@@ -1,0 +1,115 @@
+@import 'tailwindcss';
+
+/*
+ * Token di colore: un solo accento (blu petrolio #0f3d5e).
+ * In dark mode l'accento diventa una tinta chiara dello stesso blu,
+ * altrimenti su fondo scuro non raggiungerebbe il contrasto AA.
+ */
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --surface: #f5f7f9;
+  --fg: #16202a;
+  --muted: #4b5763;
+  --border: #dde3e9;
+  --accent: #0f3d5e;
+  --accent-soft: #e6eef4;
+  --on-accent: #ffffff;
+  --danger: #a4262c;
+  --success: #1e6b3a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1318;
+    --surface: #141c23;
+    --fg: #e6ebef;
+    --muted: #a3b0bc;
+    --border: #26323d;
+    --accent: #8fc3e6;
+    --accent-soft: #16293a;
+    --on-accent: #0b2233;
+    --danger: #ff9ea3;
+    --success: #8fd6a8;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, 'Liberation Mono', monospace;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--on-accent);
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-4xl px-4 sm:px-6;
+  }
+
+  .section {
+    @apply border-t border-border py-16 sm:py-20;
+  }
+
+  .section-title {
+    @apply mb-8 text-sm font-semibold tracking-[0.14em] text-accent uppercase;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition-colors;
+  }
+
+  .btn-primary {
+    @apply bg-accent text-on-accent hover:opacity-90;
+  }
+
+  .btn-secondary {
+    @apply border border-border text-fg hover:border-accent hover:text-accent;
+  }
+
+  .link {
+    @apply font-medium text-accent underline decoration-1 underline-offset-4 hover:decoration-2;
+  }
+
+  .tag {
+    @apply rounded-sm bg-accent-soft px-2 py-0.5 font-mono text-xs text-accent;
+  }
+}

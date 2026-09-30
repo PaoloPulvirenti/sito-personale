@@ -1,0 +1,31 @@
+---
+import { getContent } from '../content';
+import Section from './Section.astro';
+
+const { ai } = getContent();
+---
+
+<Section id="ai" title={ai.title}>
+  <p class="max-w-2xl text-lg text-pretty">{ai.intro}</p>
+
+  <ul class="mt-8 grid gap-4 sm:grid-cols-2">
+    {ai.practices.map((practice) => (
+      <li class="rounded-lg border border-border bg-surface p-5">
+        <h3 class="font-semibold text-accent">{practice.title}</h3>
+        <p class="mt-2 text-muted">{practice.body}</p>
+      </li>
+    ))}
+  </ul>
+
+  <h3 class="mt-12 text-lg font-semibold">{ai.teamTitle}</h3>
+  <ol class="mt-4 max-w-2xl space-y-3">
+    {ai.teamSteps.map((step, index) => (
+      <li class="flex gap-4">
+        <span class="font-mono text-sm leading-7 text-accent" aria-hidden="true">
+          {String(index + 1).padStart(2, '0')}
+        </span>
+        <span>{step}</span>
+      </li>
+    ))}
+  </ol>
+</Section>

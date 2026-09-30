@@ -17,8 +17,8 @@ describe.skipIf(!emulator)('FirestoreMessageRepository (emulatore)', () => {
     await db.terminate();
   });
 
-  it('salva il messaggio con la data di creazione del server', async () => {
-    const repository = new FirestoreMessageRepository(db, collection);
+  it('salva il messaggio con data di creazione e scadenza per la TTL', async () => {
+    const repository = new FirestoreMessageRepository(db, collection, 30);
     const consentAt = new Date('2026-09-30T10:00:00Z');
 
     const id = await repository.save({
@@ -35,5 +35,6 @@ describe.skipIf(!emulator)('FirestoreMessageRepository (emulatore)', () => {
     expect(data).toMatchObject({ name: 'Mario Rossi', privacyVersion: 'test-v1' });
     expect(data?.createdAt?.toDate()).toBeInstanceOf(Date);
     expect(data?.consentAt?.toDate().toISOString()).toBe(consentAt.toISOString());
+    expect(data?.expireAt?.toDate().toISOString()).toBe('2026-10-30T10:00:00.000Z');
   });
 });

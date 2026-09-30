@@ -1,0 +1,28 @@
+---
+import { getContent } from '../content';
+
+const { footer, hero } = getContent();
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-border py-10 text-sm text-muted">
+  <div class="container-page flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <p>
+      © {year} {hero.name} · {footer.builtWith}
+    </p>
+    <nav aria-label="Link di servizio">
+      <ul class="flex gap-5">
+        <li>
+          <a class="link" href={footer.privacy.href}>
+            {footer.privacy.label}
+          </a>
+        </li>
+        <li>
+          <a class="link" href={footer.repo.href} rel="noopener">
+            {footer.repo.label} ↗
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</footer>

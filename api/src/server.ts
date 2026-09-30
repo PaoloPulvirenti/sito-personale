@@ -11,7 +11,11 @@ const config = loadConfig();
 const repository: MessageRepository =
   config.messageStore === 'memory'
     ? new InMemoryMessageRepository()
-    : new FirestoreMessageRepository(new Firestore(), config.firestoreCollection);
+    : new FirestoreMessageRepository(
+        new Firestore(),
+        config.firestoreCollection,
+        config.retentionDays,
+      );
 
 const app = await buildApp({ config, repository, logger: loggerOptions(config) });
 

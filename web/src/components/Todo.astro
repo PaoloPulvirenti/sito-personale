@@ -1,0 +1,16 @@
+---
+/** Segnaposto visibile per un dato che manca ancora: da togliere prima della pubblicazione. */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<p
+  class:list={[
+    'rounded-md border border-dashed border-danger/60 px-3 py-2 font-mono text-xs text-danger',
+    className,
+  ]}
+>
+  TODO: <slot />
+</p>

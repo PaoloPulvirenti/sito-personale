@@ -56,12 +56,10 @@ export async function buildApp({ config, repository, logger = false }: AppDepend
     }
     if (statusCode >= 500) {
       request.log.error({ err: error }, 'errore non gestito');
-      return reply
-        .code(500)
-        .send({
-          error: 'Internal Server Error',
-          message: 'Si è verificato un errore. Riprova più tardi.',
-        });
+      return reply.code(500).send({
+        error: 'Internal Server Error',
+        message: 'Si è verificato un errore. Riprova più tardi.',
+      });
     }
 
     return reply.code(statusCode).send({ error: error.name, message: error.message });

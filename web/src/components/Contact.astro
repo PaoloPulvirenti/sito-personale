@@ -1,0 +1,141 @@
+---
+import { getContent } from '../content';
+import Section from './Section.astro';
+
+const { contact, footer } = getContent();
+const { form } = contact;
+const phoneHref = `tel:${contact.phone.replace(/\s+/g, '')}`;
+
+// Testi usati dallo script lato client.
+const messages = {
+  sending: form.sending,
+  success: form.success,
+  errorGeneric: form.errorGeneric,
+  errorRateLimit: form.errorRateLimit,
+  errorFields: form.errorFields,
+};
+const inputClass =
+  'mt-1.5 block w-full rounded-md border border-border bg-bg px-3 py-2 text-fg placeholder:text-muted focus:border-accent focus:outline-none focus-visible:outline-2 focus-visible:outline-accent aria-[invalid=true]:border-danger';
+---
+
+<Section id="contatti" title={contact.title}>
+  <div class="grid gap-12 md:grid-cols-[1fr_16rem]">
+    <div>
+      <p class="max-w-xl text-lg text-pretty">{contact.intro}</p>
+
+      <form
+        id="contact-form"
+        class="mt-8 max-w-xl space-y-5"
+        action="/api/contact"
+        method="post"
+        novalidate
+        data-messages={JSON.stringify(messages)}
+      >
+        <div>
+          <label for="cf-name" class="text-sm font-semibold">
+            {form.name}
+          </label>
+          <input
+            id="cf-name"
+            name="name"
+            type="text"
+            autocomplete="name"
+            required
+            minlength="2"
+            maxlength="100"
+            class={inputClass}
+          />
+        </div>
+        <div>
+          <label for="cf-email" class="text-sm font-semibold">
+            {form.email}
+          </label>
+          <input
+            id="cf-email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            required
+            maxlength="254"
+            class={inputClass}
+          />
+        </div>
+        <div>
+          <label for="cf-message" class="text-sm font-semibold">
+            {form.message}
+          </label>
+          <textarea
+            id="cf-message"
+            name="message"
+            rows="6"
+            required
+            minlength="10"
+            maxlength="5000"
+            class={inputClass}
+          ></textarea>
+        </div>
+
+        <!-- Honeypot: nascosto a persone e screen reader, i bot lo compilano. -->
+        <div class="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+          <label for="cf-website">{form.honeypot}</label>
+          <input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <div class="flex gap-3">
+          <input
+            id="cf-privacy"
+            name="privacy"
+            type="checkbox"
+            required
+            class="mt-1 size-4 shrink-0 accent-accent"
+          />
+          <label for="cf-privacy" class="text-sm text-muted">
+            {form.privacy}{' '}
+            <a class="link" href={footer.privacy.href}>
+              {form.privacyLink}
+            </a>
+          </label>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4">
+          <button type="submit" class="btn btn-primary disabled:opacity-60">
+            {form.submit}
+          </button>
+          <p id="cf-status" role="status" aria-live="polite" class="text-sm"></p>
+        </div>
+
+        <noscript>
+          <p class="text-sm text-danger">{form.noscript}</p>
+        </noscript>
+      </form>
+    </div>
+
+    <aside class="space-y-4 text-sm" aria-label="Altri contatti">
+      <p>
+        <span class="block font-semibold">Email</span>
+        <a class="link break-all" href={`mailto:${contact.email}`}>
+          {contact.email}
+        </a>
+      </p>
+      <p>
+        <span class="block font-semibold">Telefono</span>
+        <a class="link" href={phoneHref}>
+          {contact.phone}
+        </a>
+      </p>
+      <p>
+        <span class="block font-semibold">{contact.linkedin.label}</span>
+        <a class="link" href={contact.linkedin.href} rel="noopener">
+          Profilo LinkedIn ↗
+        </a>
+      </p>
+    </aside>
+  </div>
+</Section>
+
+<script>
+  import { submitContactForm } from '../lib/contact-form';
+
+  const formElement = document.querySelector<HTMLFormElement>('#contact-form');
+  if (formElement) submitContactForm(formElement);
+</script>
