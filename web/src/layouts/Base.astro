@@ -10,6 +10,10 @@ interface Props {
 const content = getContent();
 const { title = content.meta.title, description = content.meta.description } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+
+// Statistiche senza cookie (Cloudflare Web Analytics): solo nella build di produzione
+// e solo se il token è impostato. Il token è pubblico, finisce comunque nell'HTML.
+const analyticsToken = import.meta.env.PROD ? import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN : undefined;
 ---
 
 <!doctype html>
@@ -30,6 +34,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:site_name" content={content.meta.siteName} />
     <meta property="og:locale" content="it_IT" />
     <meta name="generator" content={Astro.generator} />
+    {analyticsToken && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={JSON.stringify({ token: analyticsToken })}
+      />
+    )}
   </head>
   <body class="min-h-dvh font-sans leading-relaxed">
     <a

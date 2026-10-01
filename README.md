@@ -58,7 +58,8 @@ Portfolio e prova tecnica: il sito è costruito con lo stack che dichiaro
 - **Rate limit** per IP sul form (5 messaggi ogni 10 minuti). L'IP si legge da `X-Forwarded-For` fidandosi solo dei salti di proxy indicati in `TRUST_PROXY_HOPS`: su Cloud Run il container si raggiunge solo dal front end Google, quindi il conteggio non è falsificabile.
 - **Minimizzazione**: si salvano solo nome, email, messaggio, data del consenso e versione dell'informativa. Niente IP né user agent nel database.
 - **Conservazione**: ogni messaggio ha un campo `expireAt` e una policy TTL di Firestore lo cancella dopo 12 mesi, come dichiarato in `/privacy`.
-- **Nessun cookie** e nessun analytics. CSP senza `unsafe-inline`, `frame-ancestors 'none'`, HSTS.
+- **Nessun cookie**. Le statistiche usano Cloudflare Web Analytics, senza cookie e solo aggregate. CSP senza `unsafe-inline`, `frame-ancestors 'none'`, HSTS.
+- **Avviso email** a ogni messaggio (Gmail SMTP). La password per le app sta in Secret Manager e un errore di invio non fa perdere il messaggio, già salvato su Firestore.
 - **Segreti**: nessuno nel repo. Su Cloud Run le credenziali arrivano dal service account.
 - **Regole Firestore** chiuse: il database non è raggiungibile dal browser.
 
@@ -179,6 +180,32 @@ In _Settings → Secrets and variables → Actions → Variables_ (non sono segr
 | `GCP_RUNTIME_SERVICE_ACCOUNT`    | `sito-api-runtime@paolo-sito.iam.gserviceaccount.com`                                      |
 
 Finché `GCP_PROJECT_ID` è vuota, la pipeline esegue solo lint, test e build e salta il deploy.
+
+Facoltative:
+
+| Variabile            | Effetto                                                                                  |
+| -------------------- | ---------------------------------------------------------------------------------------- |
+| `NOTIFY_EMAIL_TO`    | casella che riceve un'email a ogni messaggio; richiede il secret `smtp-password` (sotto) |
+| `CF_ANALYTICS_TOKEN` | token di Cloudflare Web Analytics; vuoto = nessuna statistica                            |
+
+### Avviso email
+
+1. Con la verifica in due passaggi attiva, crea una password per le app su https://myaccount.google.com/apppasswords.
+2. Salvala in Secret Manager **dal tuo terminale**, così non passa da nessun file né chat:
+
+```bash
+gcloud services enable secretmanager.googleapis.com --project paolo-sito
+gcloud secrets create smtp-password --replication-policy=automatic --project paolo-sito
+gcloud secrets versions add smtp-password --data-file=- --project paolo-sito
+```
+
+L'ultimo comando aspetta la password: incollala, premi Invio e poi Ctrl+Z e Invio (su Windows) o Ctrl+D (su macOS/Linux).
+
+3. Dai al service account dell'API il permesso di leggerla, poi imposta `NOTIFY_EMAIL_TO`:
+
+```bash
+gcloud secrets add-iam-policy-binding smtp-password --project paolo-sito   --member=serviceAccount:sito-api-runtime@paolo-sito.iam.gserviceaccount.com   --role=roles/secretmanager.secretAccessor
+```
 
 ### 3. Primo deploy
 

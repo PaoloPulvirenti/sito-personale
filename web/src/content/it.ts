@@ -293,7 +293,7 @@ export const it: SiteContent = {
 
   privacy: {
     title: 'Informativa privacy',
-    updated: 'Ultimo aggiornamento: 30 settembre 2026',
+    updated: 'Ultimo aggiornamento: 1 ottobre 2026',
     sections: [
       {
         heading: 'Titolare del trattamento',
@@ -303,7 +303,8 @@ export const it: SiteContent = {
         heading: 'Quali dati raccolgo',
         body: [
           'Solo quelli che inserisci nel form contatti: nome, email e messaggio, insieme alla data del consenso e alla versione di questa informativa.',
-          'Il sito non usa cookie, né di profilazione né di statistica, e non contiene strumenti di tracciamento di terze parti.',
+          'Il sito non usa cookie, né di profilazione né di statistica.',
+          'Per sapere quante persone visitano il sito uso Cloudflare Web Analytics, che non usa cookie, non salva nulla sul tuo dispositivo e non identifica i singoli visitatori. Raccoglie solo dati aggregati: pagine viste, sito di provenienza, paese, browser e tipo di dispositivo.',
           'Come ogni servizio web, l’infrastruttura registra log tecnici delle richieste (ad esempio indirizzo IP e orario) per sicurezza e prevenzione degli abusi. Questi log non sono collegati ai messaggi e vengono conservati per il periodo standard di Google Cloud Logging (30 giorni).',
         ],
       },
@@ -311,13 +312,15 @@ export const it: SiteContent = {
         heading: 'Perché li tratto',
         body: [
           'Per leggere il tuo messaggio e risponderti. La base giuridica è il tuo consenso (art. 6.1.a GDPR), che puoi revocare in qualsiasi momento, e, se mi contatti per una proposta di lavoro, l’esecuzione di misure precontrattuali su tua richiesta (art. 6.1.b).',
+          'Le statistiche aggregate sulle visite servono a capire se il sito viene letto e da dove arrivano i visitatori. La base giuridica è il mio legittimo interesse (art. 6.1.f), dato che non identificano nessuno.',
         ],
       },
       {
         heading: 'Dove e per quanto tempo',
         body: [
-          'I messaggi sono salvati su Google Cloud Firestore in un data center nell’Unione Europea. Google agisce come responsabile del trattamento.',
-          'Ogni messaggio viene cancellato automaticamente 12 mesi dopo l’invio. Non cedo i dati a terzi e non li uso per newsletter o marketing.',
+          'I messaggi sono salvati su Google Cloud Firestore in un data center nell’Unione Europea. Quando ne arriva uno, ricevo una copia via email sulla mia casella Gmail per poterti rispondere.',
+          'Ogni messaggio viene cancellato automaticamente da Firestore 12 mesi dopo l’invio, e cancello le copie email entro lo stesso termine. Non cedo i dati a terzi e non li uso per newsletter o marketing.',
+          'Google (Firestore e Gmail) e Cloudflare (statistiche) agiscono come responsabili del trattamento. Eventuali trasferimenti fuori dall’Unione Europea avvengono nell’ambito dell’EU-U.S. Data Privacy Framework, a cui entrambe le società aderiscono.',
         ],
       },
       {

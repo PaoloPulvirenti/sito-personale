@@ -44,6 +44,9 @@ jobs:
           FIRESTORE_EMULATOR_HOST: localhost:8081
 
       - run: npm run build
+        env:
+          # Statistiche Cloudflare senza cookie: il token è pubblico, sta nelle variabili del repo.
+          PUBLIC_CF_ANALYTICS_TOKEN: ${{ vars.CF_ANALYTICS_TOKEN }}
 
       - uses: actions/upload-artifact@v7
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -99,6 +102,10 @@ jobs:
             GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }}
             TRUST_PROXY_HOPS=2
             LOG_LEVEL=info
+            NOTIFY_EMAIL_TO=${{ vars.NOTIFY_EMAIL_TO }}
+          # Avviso email: la password per le app Gmail sta in Secret Manager ("smtp-password")
+          # e si collega solo quando la variabile NOTIFY_EMAIL_TO è impostata nel repo.
+          secrets: ${{ vars.NOTIFY_EMAIL_TO != '' && 'SMTP_PASSWORD=smtp-password:latest' || '' }}
 
       - uses: actions/download-artifact@v8
         with:
