@@ -2,6 +2,8 @@ import { Firestore } from '@google-cloud/firestore';
 import { buildApp } from './app.js';
 import { loadConfig } from './config.js';
 import { loggerOptions } from './logger.js';
+import { EmailNotifier } from './notifiers/email-notifier.js';
+import { NoopNotifier, type Notifier } from './notifiers/notifier.js';
 import { FirestoreMessageRepository } from './repositories/firestore-message-repository.js';
 import { InMemoryMessageRepository } from './repositories/in-memory-message-repository.js';
 import type { MessageRepository } from './repositories/message-repository.js';
@@ -17,7 +19,9 @@ const repository: MessageRepository =
         config.retentionDays,
       );
 
-const app = await buildApp({ config, repository, logger: loggerOptions(config) });
+const notifier: Notifier = config.smtp ? new EmailNotifier(config.smtp) : new NoopNotifier();
+
+const app = await buildApp({ config, repository, notifier, logger: loggerOptions(config) });
 
 // Cloud Run manda SIGTERM prima di spegnere l'istanza: chiudiamo le richieste in corso.
 for (const signal of ['SIGTERM', 'SIGINT'] as const) {
@@ -35,7 +39,7 @@ for (const signal of ['SIGTERM', 'SIGINT'] as const) {
 
 try {
   await app.listen({ host: config.host, port: config.port });
-  app.log.info({ store: config.messageStore }, 'api pronta');
+  app.log.info({ store: config.messageStore, emailNotify: Boolean(config.smtp) }, 'api pronta');
 } catch (err) {
   app.log.fatal({ err }, 'avvio fallito');
   process.exit(1);

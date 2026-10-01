@@ -2,6 +2,7 @@ import rateLimit from '@fastify/rate-limit';
 import type { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import Fastify, { type FastifyError, type FastifyServerOptions } from 'fastify';
 import type { Config } from './config.js';
+import { NoopNotifier, type Notifier } from './notifiers/notifier.js';
 import type { MessageRepository } from './repositories/message-repository.js';
 import { contactRoutes } from './routes/contact.js';
 import { healthRoutes } from './routes/health.js';
@@ -9,6 +10,8 @@ import { healthRoutes } from './routes/health.js';
 export interface AppDependencies {
   config: Config;
   repository: MessageRepository;
+  /** Avviso a ogni messaggio salvato; di default nessuno. */
+  notifier?: Notifier;
   logger?: FastifyServerOptions['logger'];
 }
 
@@ -16,7 +19,12 @@ export interface AppDependencies {
  * Costruisce l'app senza metterla in ascolto: i test la usano con `app.inject()`,
  * `server.ts` la avvia davvero.
  */
-export async function buildApp({ config, repository, logger = false }: AppDependencies) {
+export async function buildApp({
+  config,
+  repository,
+  notifier = new NoopNotifier(),
+  logger = false,
+}: AppDependencies) {
   const hops = config.trustProxyHops;
   const app = Fastify({
     logger,
@@ -70,6 +78,7 @@ export async function buildApp({ config, repository, logger = false }: AppDepend
   await app.register(contactRoutes, {
     prefix: '/api',
     repository,
+    notifier,
     privacyVersion: config.privacyVersion,
     rateLimit: { max: config.rateLimitMax, timeWindowMs: config.rateLimitWindowMs },
   });

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { InMemoryMessageRepository } from '../src/repositories/in-memory-message-repository.js';
-import type { MessageRepository } from '../src/repositories/message-repository.js';
+import type { Notifier } from '../src/notifiers/notifier.js';
+import type { ContactMessage, MessageRepository } from '../src/repositories/message-repository.js';
 import { closeApps, makeApp, validBody, type App } from './helpers.js';
 
 afterEach(closeApps);
@@ -141,5 +142,51 @@ describe('POST /api/contact', () => {
     const { app } = await makeApp();
     const res = await postContact(app, { ...validBody, message: 'x'.repeat(20 * 1024) });
     expect(res.statusCode).toBe(413);
+  });
+});
+
+describe('avviso email', () => {
+  function recordingNotifier() {
+    const calls: { message: ContactMessage; id: string }[] = [];
+    const notifier: Notifier = {
+      notify: (message, id) => {
+        calls.push({ message, id });
+        return Promise.resolve();
+      },
+    };
+    return { notifier, calls };
+  }
+
+  it('avvisa con il messaggio salvato e il suo id', async () => {
+    const repository = new InMemoryMessageRepository();
+    const { notifier, calls } = recordingNotifier();
+    const { app } = await makeApp({}, repository, notifier);
+
+    await postContact(app, validBody);
+
+    const [savedId] = [...repository.messages.keys()];
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.id).toBe(savedId);
+    expect(calls[0]?.message.email).toBe('mario.rossi@example.com');
+  });
+
+  it('non avvisa per i messaggi scartati dal honeypot', async () => {
+    const { notifier, calls } = recordingNotifier();
+    const { app } = await makeApp({}, undefined, notifier);
+
+    await postContact(app, { ...validBody, website: 'https://spam.example' });
+
+    expect(calls).toHaveLength(0);
+  });
+
+  it("se l'avviso fallisce il messaggio è comunque salvato e la risposta è 201", async () => {
+    const repository = new InMemoryMessageRepository();
+    const failing: Notifier = { notify: () => Promise.reject(new Error('SMTP giù')) };
+    const { app } = await makeApp({}, repository, failing);
+
+    const res = await postContact(app, validBody);
+
+    expect(res.statusCode).toBe(201);
+    expect(repository.messages.size).toBe(1);
   });
 });
